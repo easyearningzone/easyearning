@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Register - EASY EARNING ZONE</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+    <style>
+        :root { --pink: #ff1493; --yellow: #ffd700; --red: #E4002B; }
+        body { font-family: 'Segoe UI', sans-serif; background: #fffdf0; }
+        .bg-gradient { background: linear-gradient(135deg, var(--pink) 0%, var(--yellow) 100%); min-height: 100vh; }
+        .glass-card { background: rgba(255, 255, 255, 0.98); border-radius: 24px; box-shadow: 0 15px 35px rgba(0,0,0,0.2); border-top: 6px solid var(--pink); }
+    </style>
+</head>
+<body class="bg-gradient flex items-center justify-center p-4">
+
+<div class="w-full max-w-md glass-card p-8">
+    <div class="text-center mb-6">
+        <h1 class="text-2xl font-black text-pink-600">EASY EARNING ZONE</h1>
+        <p class="text-sm text-gray-500 font-bold">একাউন্ট তৈরি করতে ফরমটি পূরণ করুন</p>
+    </div>
+
+    <form id="regForm" class="space-y-4">
+        <div class="relative">
+            <i class="fas fa-user absolute left-4 top-1/2 -translate-y-1/2 text-pink-500"></i>
+            <input type="text" id="full_name" required placeholder="আপনার নাম" class="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-pink-500">
+        </div>
+
+        <div class="relative">
+            <i class="fas fa-phone absolute left-4 top-1/2 -translate-y-1/2 text-pink-500"></i>
+            <input type="tel" id="phone" required maxlength="11" placeholder="ফোন নাম্বার" class="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-pink-500">
+        </div>
+
+        <div class="relative">
+            <i class="fas fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-pink-500"></i>
+            <input type="password" id="user_pass" required placeholder="পাসওয়ার্ড দিন" class="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-pink-500">
+        </div>
+
+        <div class="relative">
+            <i class="fas fa-link absolute left-4 top-1/2 -translate-y-1/2 text-pink-500"></i>
+            <input type="text" id="upline" required placeholder="রেফার কোড (Upline)" class="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 outline-none focus:border-pink-500">
+        </div>
+
+        <button type="submit" id="submitBtn" class="w-full py-4 bg-[#E4002B] text-white font-extrabold rounded-xl shadow-lg hover:brightness-110 active:scale-95 transition">
+            <span id="btnText">রেজিস্টার করুন</span>
+        </button>
+    </form>
+    
+    <p class="text-center text-sm mt-5 text-gray-600">
+        আগে থেকেই একাউন্ট আছে? 
+        <a href="login.html" class="text-pink-600 font-bold">লগইন করুন</a>
+    </p>
+</div>
+
+<script>
+    const SUPABASE_URL = "https://apnzwgrupifhmifqbndu.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_Diosdxt2gvWcbb07LGYzLg_j6DM7Txn";
+
+    document.getElementById('regForm').addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        const btn = document.getElementById('submitBtn');
+        const btnText = document.getElementById('btnText');
+        
+        const name = document.getElementById('full_name').value;
+        const pass = document.getElementById('user_pass').value;
+        const phoneNum = document.getElementById('phone').value;
+
+        // Refer code auto-generate
+        const myRefer = Math.floor(100000 + Math.random() * 900000).toString();
+
+        const userData = {
+            full_name: name + " | Pass: " + pass, 
+            phone: phoneNum,
+            refer_code: myRefer,
+            upline: document.getElementById('upline').value,
+            is_verified: false
+        };
+
+        btn.disabled = true;
+        btnText.innerText = "অপেক্ষা করুন...";
+
+        try {
+            // Check if user already exists
+            const checkRes = await fetch(`${SUPABASE_URL}/rest/v1/profiles?phone=eq.${phoneNum}`, {
+                headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
+            });
+            const existing = await checkRes.json();
+
+            if (existing.length > 0) {
+                alert("এই নাম্বারে অলরেডি একাউন্ট আছে!");
+                btn.disabled = false;
+                btnText.innerText = "রেজিস্টার করুন";
+                return;
+            }
+
+            // Submit Data
+            const response = await fetch(`${SUPABASE_URL}/rest/v1/profiles`, {
+                method: "POST",
+                headers: {
+                    "apikey": SUPABASE_KEY,
+                    "Authorization": `Bearer ${SUPABASE_KEY}`,
+                    "Content-Type": "application/json",
+                    "Prefer": "return=minimal"
+                },
+                body: JSON.stringify(userData)
+            });
+
+            if (response.ok) {
+                alert("সাফল্য! একাউন্ট তৈরি হয়েছে।\nরেফার কোড: " + myRefer);
+                // রেজিস্ট্রেশন সফল হলে লগইন পেজে পাঠিয়ে দেবে
+                window.location.href = "login.html"; 
+            } else {
+                alert("কিছু একটা সমস্যা হয়েছে, আবার চেষ্টা করুন।");
+            }
+        } catch (error) {
+            alert("ইন্টারনেট সমস্যা!");
+        } finally {
+            btn.disabled = false;
+            btnText.innerText = "রেজিস্টার করুন";
+        }
+    });
+</script>
+</body>
+  </html>
