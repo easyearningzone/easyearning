@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8"/>
+    <title>জিমেইল সেল হিস্ট্রি - MY EARNING ZONE</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;600;700&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+    <style>
+        :root{ --header-h:75px; --bg:#fffdf0; --g1:#ff1493; --g2:#ffd700; --bd-red:#E4002B; }
+        body{ background:var(--bg); font-family:'Noto Sans Bengali', sans-serif; margin:0; padding-bottom: 80px; }
+        
+        header { 
+            height: var(--header-h); position: fixed; top: 0; left: 0; right: 0; z-index: 9999; 
+            display: flex; align-items: center; justify-content: space-between; padding: 0 16px; 
+            background: linear-gradient(135deg, var(--g1) 0%, var(--g1) 40%, var(--g2) 100%);
+            box-shadow: 0 4px 20px rgba(255, 20, 147, 0.3); border-bottom: 2px solid var(--g2);
+        }
+
+        .main-shell { padding-top: calc(var(--header-h) + 20px); }
+        .bd-grad { background: linear-gradient(90deg, var(--g1), var(--g2)); }
+        .bd-text-grad { -webkit-background-clip: text; background-clip: text; color: transparent; background-image: linear-gradient(90deg, var(--g1), var(--g2)); }
+        
+        .hero { border-radius: 20px; color: #fff; position: relative; overflow: hidden; box-shadow: 0 12px 28px rgba(0,0,0,.12); }
+        .icon-bubble { width: 48px; height: 48px; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; background: rgba(255,255,255,.18); border: 1px solid rgba(255,255,255,.35); color: #fff; }
+        
+        .btn-bd { border: 2px solid var(--g1); color: var(--g1); font-weight: 800; border-radius: 12px; padding: .55rem .8rem; transition: .18s; width: 100%; background: #fff; font-size: 13px; }
+        .btn-bd.active { color: #fff; border-color: transparent; background: linear-gradient(90deg, var(--g1), var(--g2)); box-shadow: 0 8px 15px rgba(255, 20, 147, 0.2); }
+        
+        .card-flag { border: 1px solid #e5e7eb; border-radius: 16px; background: #fff; box-shadow: 0 8px 20px rgba(0,0,0,.05); transition: 0.3s; }
+        .pill { border-radius: 999px; padding: .25rem .6rem; font-weight: 800; font-size: .75rem; }
+        .pill-warn { background: #fff7ed; color: #b45309; border: 1px solid #fed7aa; }
+        .pill-success { background: #ecfdf5; color: #065f46; border: 1px solid #a7f3d0; }
+        .pill-danger { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+        
+        .copy-btn { border: 1px solid #eee; border-radius: 8px; background: #f9fafb; color: var(--g1); padding: 4px 10px; font-size: 12px; font-weight: bold; }
+        .empty { border: 2px dashed #e5e7eb; border-radius: 20px; padding: 40px 20px; text-align: center; color: #9ca3af; }
+        
+        #toast { position: fixed; left: 50%; transform: translateX(-50%); bottom: 90px; background: var(--g1); color: #fff; padding: 10px 20px; border-radius: 12px; font-weight: bold; display: none; z-index: 10000; box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+    </style>
+</head>
+<body>
+
+<header>
+    <div style="display:flex; align-items:center; gap:12px;">
+        <button onclick="location.href='gmail_sell.html'" style="font-size:22px; color:#FFFFFF;"><i class="fa-solid fa-arrow-left"></i></button>
+        <h1 style="font-weight:900; font-size:18px; color: #fff;">হিস্ট্রি</h1>
+    </div>
+    <div style="border-left:2px solid #FFD700; padding-left:10px;">
+        <img src="https://myearningzone.com/images/logo-20260221212348.jpeg" style="height:40px; border-radius:10px;">
+    </div>
+</header>
+
+<main class="main-shell container max-w-md">
+    <div class="hero bd-grad p-4 mb-4">
+        <div class="d-flex align-items-center gap-3">
+            <span class="icon-bubble"><i class="fab fa-google fa-lg"></i></span>
+            <div>
+                <h2 class="h6 fw-bold mb-0">Gmail Sales History</h2>
+                <div style="font-size: 11px; opacity: 0.9;">আপনার সাবমিট করা জিমেইল এর তালিকা</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-2 mb-4" id="filterGroup">
+        <div class="col-3"><button class="btn-bd active" onclick="fetchData('all', this)">All</button></div>
+        <div class="col-3"><button class="btn-bd" onclick="fetchData('pending', this)">Wait</button></div>
+        <div class="col-3"><button class="btn-bd" onclick="fetchData('completed', this)">Sold</button></div>
+        <div class="col-3"><button class="btn-bd" onclick="fetchData('rejected', this)">Back</button></div>
+    </div>
+
+    <div id="historyContainer" class="space-y-3">
+        <div class="text-center py-10">
+            <div class="spinner-border text-pink-500" role="status"></div>
+            <p class="text-gray-400 text-sm mt-2">লোড হচ্ছে...</p>
+        </div>
+    </div>
+</main>
+
+<div id="toast"></div>
+
+<script>
+    const SUPABASE_URL = "https://apnzwgrupifhmifqbndu.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_Diosdxt2gvWcbb07LGYzLg_j6DM7Txn";
+    const phone = localStorage.getItem('userPhone');
+
+    async function fetchData(status = 'all', btnEl = null) {
+        // ট্যাব ডিজাইন আপডেট
+        if(btnEl) {
+            document.querySelectorAll('#filterGroup .btn-bd').forEach(b => b.classList.remove('active'));
+            btnEl.classList.add('active');
+        }
+
+        const container = document.getElementById('historyContainer');
+        
+        // কুয়েরি তৈরি
+        let url = `${SUPABASE_URL}/rest/v1/task_submissions?user_phone=eq.${phone}&task_name=eq.Gmail%20Sell&order=created_at.desc`;
+        if(status !== 'all') url += `&status=eq.${status}`;
+
+        try {
+            const response = await fetch(url, {
+                headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
+            });
+            const data = await response.json();
+
+            if(data.length === 0) {
+                container.innerHTML = `<div class="empty"><i class="fas fa-folder-open fa-2x mb-2"></i><br>কোনো ডাটা পাওয়া যায়নি</div>`;
+                return;
+            }
+
+            container.innerHTML = data.map(item => {
+                let sClass = 'pill-warn', sText = 'Pending';
+                if(item.status === 'completed') { sClass = 'pill-success'; sText = 'Sold'; }
+                if(item.status === 'rejected') { sClass = 'pill-danger'; sText = 'Rejected'; }
+
+                return `
+                <div class="card-flag p-3 mb-3">
+                    <div class="flex justify-between items-start">
+                        <div class="max-w-[70%]">
+                            <div class="text-[13px] font-bold text-gray-800 truncate">${item.proof_img}</div>
+                            <div class="text-[10px] text-gray-400">${new Date(item.created_at).toLocaleString('bn-BD')}</div>
+                        </div>
+                        <span class="pill ${sClass}">${sText}</span>
+                    </div>
+                    <div class="flex justify-between items-center mt-3 pt-2 border-t border-gray-50">
+                        <div class="font-black bd-text-grad">৳ ${item.reward}</div>
+                        <button class="copy-btn" onclick="copyIt('${item.proof_img}')">
+                            <i class="far fa-copy"></i> কপি
+                        </button>
+                    </div>
+                </div>`;
+            }).join('');
+
+        } catch (err) {
+            container.innerHTML = `<p class="text-center text-red-500">Error loading data!</p>`;
+        }
+    }
+
+    function copyIt(text) {
+        const cleanText = text.replace('ID: ', '').replace('Gmail: ', '');
+        navigator.clipboard.writeText(cleanText);
+        showToast("✅ কপি হয়েছে!");
+    }
+
+    function showToast(msg) {
+        const t = document.getElementById('toast');
+        t.innerText = msg;
+        t.style.display = 'block';
+        setTimeout(() => { t.style.display = 'none'; }, 2000);
+    }
+
+    window.onload = () => fetchData('all');
+</script>
+
+</body>
+      </html>
