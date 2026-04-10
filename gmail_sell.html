@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>জিমেইল মার্কেটিং - MY EARNING ZONE</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        :root { --g1:#ff1493; --g2:#ffd700; --bd-red:#E4002B; }
+        body { font-family: 'Noto Sans Bengali', sans-serif; background: #fffdf0; margin: 0; padding-bottom: 80px; }
+        
+        /* Header & Navigation Styles matching your previous design */
+        header { 
+            height: 75px; position: sticky; top: 0; z-index: 9999; display: flex; 
+            align-items: center; justify-content: space-between; padding: 0 16px; 
+            color: #FFFFFF; background: linear-gradient(135deg, #FF1493 0%, #FF1493 40%, #FFD700 100%);
+            box-shadow: 0 4px 20px rgba(255, 20, 147, 0.3); border-bottom: 2px solid #FFD700;
+        }
+
+        .bd-card { background: #fff; border: 1px solid #e5e7eb; border-radius: 16px; box-shadow: 0 10px 24px rgba(0,0,0,.06); margin-bottom: 15px; padding: 20px; }
+        .bd-card-soft { background: linear-gradient(#fff,#fff) padding-box, linear-gradient(90deg,var(--g1),var(--g2)) border-box; border: 2px solid transparent; border-radius: 16px; margin-bottom: 15px; }
+        .bd-text-grad { -webkit-background-clip: text; background-clip: text; color: transparent; background-image: linear-gradient(90deg,var(--g1),var(--g2)); }
+        .bd-grad { background: linear-gradient(90deg,var(--g1),var(--g2)); }
+        
+        .inp { width: 100%; border: 1px solid #d1d5db; border-radius: 10px; padding: .65rem .85rem; outline: none; transition: 0.2s; }
+        .inp:focus { border-color: var(--g1); box-shadow: 0 0 0 3px rgba(255, 20, 147, 0.1); }
+        .bd-btn { background: linear-gradient(90deg,var(--g1),var(--g2)); color: #fff; font-weight: 800; border: 0; border-radius: 12px; transition: .18s; cursor: pointer; }
+        .bd-btn:active { transform: scale(0.98); }
+        
+        .bd-copy { position: absolute; top: .45rem; right: .45rem; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #fff; color: var(--g1); border: 1px solid rgba(0,0,0,.08); }
+    </style>
+</head>
+<body>
+
+<header>
+    <div style="display:flex; align-items:center; gap:12px;">
+        <button onclick="history.back()" style="font-size:22px; color:#FFFFFF;"><i class="fa-solid fa-arrow-left"></i></button>
+        <h1 style="font-weight:900; font-size:18px;">জিমেইল সেল</h1>
+    </div>
+    <div style="border-left:2px solid #FFD700; padding-left:10px;">
+        <img src="https://myearningzone.com/images/logo-20260221212348.jpeg" style="height:40px; border-radius:10px;">
+    </div>
+</header>
+
+<main class="max-w-md mx-auto px-4 mt-6">
+    <a href="gmail_history.html" class="bd-card-soft block p-[2px]">
+        <div class="bg-white rounded-[14px] px-4 py-3 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-pink-50 text-pink-500 rounded-lg flex items-center justify-center border border-pink-100">
+                    <i class="fas fa-clock-rotate-left"></i>
+                </div>
+                <div>
+                    <div class="font-bold text-sm text-gray-800">জিমেইল সেল হিস্ট্রি</div>
+                    <div class="text-[10px] text-gray-400">আপনার আগের সব সাবমিশন</div>
+                </div>
+            </div>
+            <i class="fas fa-arrow-right text-gray-400 text-sm"></i>
+        </div>
+    </a>
+
+    <div class="bd-card mt-4">
+        <h1 class="text-xl font-black text-center bd-text-grad mb-1 uppercase">Gmail Marketing</h1>
+        <p class="text-[11px] text-center text-gray-400 mb-2">সঠিক পাসওয়ার্ড সাবমিট করুন; ভুল তথ্যে আইডি সাসপেন্ড হবে।</p>
+        <p class="text-[11px] text-center font-bold text-red-500 mb-4">রিপোর্ট টাইম: ২–৩ দিন</p>
+
+        <div class="flex gap-3 mb-4">
+            <div class="flex-1 bg-gray-50 border border-gray-100 rounded-xl p-3 text-center">
+                <div class="text-[10px] text-gray-400">লিমিট</div>
+                <div class="font-bold text-gray-800">Unlimited</div>
+            </div>
+            <div class="flex-1 bg-gray-50 border border-gray-100 rounded-xl p-3 text-center">
+                <div class="text-[10px] text-gray-400">প্রাইস</div>
+                <div class="font-bold bd-text-grad" id="displayPrice">৳ ১৩.৫০</div>
+            </div>
+        </div>
+
+        <div class="bd-grad text-white rounded-xl p-4 relative">
+            <div class="text-center font-bold text-sm opacity-90 mb-2">আজকের সিস্টেম পাসওয়ার্ড</div>
+            <div class="bg-white/20 rounded-lg p-3 text-center font-black tracking-widest relative">
+                <span id="systemPass">Loading...</span>
+                <button onclick="copyText('systemPass')" class="bd-copy"><i class="fas fa-copy"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <div class="bd-card">
+        <h2 class="text-md font-bold text-center bd-text-grad mb-4">তথ্য প্রদান করুন</h2>
+        <form id="gmailSubmitForm" class="space-y-4">
+            <div>
+                <label class="block text-[12px] font-bold text-gray-700 mb-1">জিমেইল এড্রেস</label>
+                <input type="email" id="gmail_user" class="inp" placeholder="example@gmail.com" required>
+            </div>
+            <div>
+                <label class="block text-[12px] font-bold text-gray-700 mb-1">এডমিন সেট করা পাসওয়ার্ড</label>
+                <input type="text" id="pass_user" class="inp" placeholder="উপরের পাসওয়ার্ডটি লিখুন" required>
+                <p class="text-[10px] text-gray-400 mt-1">*সিস্টেম পাসওয়ার্ড ছাড়া সাবমিট হবে না।</p>
+            </div>
+            <button type="submit" id="subBtn" class="bd-btn w-full py-3 shadow-lg">
+                <i class="fas fa-paper-plane mr-2"></i> সাবমিট করুন
+            </button>
+        </form>
+    </div>
+</main>
+
+<script>
+    const SUPABASE_URL = "https://apnzwgrupifhmifqbndu.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_Diosdxt2gvWcbb07LGYzLg_j6DM7Txn";
+
+    // ১. অ্যাডমিন সেটিংস থেকে ডাটা আনা
+    async function fetchSettings() {
+        try {
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/app_settings?id=eq.1`, {
+                headers: { "apikey": SUPABASE_KEY, "Authorization": `Bearer ${SUPABASE_KEY}` }
+            });
+            const data = await res.json();
+            if(data[0]) {
+                document.getElementById('systemPass').innerText = data[0].gmail_pass || "@ahad2026";
+                document.getElementById('displayPrice').innerText = "৳ " + (data[0].gmail_price || "13.50");
+            }
+        } catch (e) { console.error(e); }
+    }
+
+    // ২. ফর্ম সাবমিট
+    document.getElementById('gmailSubmitForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('subBtn');
+        const userGmail = document.getElementById('gmail_user').value;
+        const userPass = document.getElementById('pass_user').value;
+        const sysPass = document.getElementById('systemPass').innerText;
+        const phone = localStorage.getItem('userPhone');
+
+        if (userPass !== sysPass) {
+            alert("ভুল পাসওয়ার্ড! উপরের বক্সের পাসওয়ার্ডটি কপি করে এখানে দিন।");
+            return;
+        }
+
+        btn.disabled = true;
+        btn.innerText = "Processing...";
+
+        try {
+            const res = await fetch(`${SUPABASE_URL}/rest/v1/task_submissions`, {
+                method: "POST",
+                headers: { 
+                    "apikey": SUPABASE_KEY, 
+                    "Authorization": `Bearer ${SUPABASE_KEY}`,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    user_phone: phone,
+                    task_name: "Gmail Sell",
+                    proof_img: "ID: " + userGmail, // ইমেইলটি ডাটা হিসেবে জমা হবে
+                    reward: 13.5,
+                    status: "pending"
+                })
+            });
+
+            if(res.ok) {
+                alert("সফলভাবে জমা হয়েছে! অ্যাডমিন চেক করে ব্যালেন্স এড করে দিবে।");
+                location.reload();
+            } else {
+                alert("সার্ভার সমস্যা! আবার চেষ্টা করুন।");
+            }
+        } catch (err) {
+            alert("Error: " + err.message);
+        } finally {
+            btn.disabled = false;
+            btn.innerText = "সাবমিট করুন";
+        }
+    });
+
+    function copyText(id) {
+        const text = document.getElementById(id).innerText;
+        navigator.clipboard.writeText(text);
+        alert("কপি হয়েছে: " + text);
+    }
+
+    window.onload = fetchSettings;
+</script>
+
+</body>
+  </html>
