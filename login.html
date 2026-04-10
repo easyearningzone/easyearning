@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Login - MY EARNING ZONE</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;600;800&display=swap" rel="stylesheet" />
+  <style>
+    :root { --bg: #fffdf0; --text: #000000; --icon: #ff1493; --hover: #ffd700; --accent-red: #E4002B; }
+    body { font-family: 'Noto Sans Bengali', sans-serif; color: var(--text); background: var(--bg); }
+    .flag-bg {
+      min-height: 100vh;
+      background: radial-gradient(circle at 75% 30%, rgba(228, 0, 43, 0.85) 0%, rgba(228, 0, 43, 0.85) 140px, rgba(0,0,0,0) 141px),
+                  linear-gradient(135deg, var(--icon) 0%, var(--hover) 35%, var(--icon) 100%);
+    }
+    .glow { animation: glowPulse 2.2s infinite ease-in-out; }
+    @keyframes glowPulse {
+      0%,100% { box-shadow: 0 0 0 rgba(228,0,43,0.0) }
+      50% { box-shadow: 0 0 20px rgba(228,0,43,0.35) }
+    }
+  </style>
+</head>
+<body class="flag-bg flex items-center justify-center p-4">
+
+  <div class="w-full max-w-md">
+    <div class="rounded-3xl overflow-hidden shadow-2xl ring-1 ring-black/10 bg-white/95">
+      <div class="h-2 w-full" style="background: var(--icon);"></div>
+      <div class="p-8">
+        <div class="text-center mb-6">
+          <h2 class="font-semibold" style="color: var(--icon);">স্বাগতম</h2>
+          <h1 class="text-2xl sm:text-3xl font-extrabold" style="color: var(--hover);">MY EARNING ZONE</h1>
+          <p class="text-sm mt-1" style="color: var(--icon);">আপনার একাউন্টে লগইন করুন</p>
+        </div>
+        
+        <form id="loginForm" class="space-y-5">
+          <div>
+            <div class="relative">
+              <i class="fas fa-phone absolute left-4 top-1/2 -translate-y-1/2" style="color: var(--icon);"></i>
+              <input id="phone" type="tel" placeholder="মোবাইল নাম্বার (১১ ডিজিট)" required maxlength="11" class="w-full pl-12 pr-4 py-3 rounded-xl border focus:outline-none focus:ring-2 transition bg-white" style="border-color: color-mix(in srgb, var(--icon) 25%, transparent);">
+            </div>
+          </div>
+
+          <div>
+            <div class="relative">
+              <i class="fas fa-lock absolute left-4 top-1/2 -translate-y-1/2" style="color: var(--icon);"></i>
+              <input id="password" type="password" placeholder="পাসওয়ার্ড" required class="w-full pl-12 pr-12 py-3 rounded-xl border focus:outline-none focus:ring-2 transition bg-white" style="border-color: color-mix(in srgb, var(--icon) 25%, transparent);">
+              <button type="button" onclick="togglePass('password', this)" class="absolute right-3 top-1/2 -translate-y-1/2" style="color: var(--icon);">
+                <i class="fas fa-eye-slash"></i>
+              </button>
+            </div>
+          </div>
+
+          <button type="submit" id="loginBtn" class="glow w-full py-3 rounded-xl text-white font-bold text-lg transition flex items-center justify-center gap-2" style="background: var(--accent-red);">
+            <i class="fas fa-right-to-bracket"></i>
+            <span id="btnText">লগইন করুন</span>
+          </button>
+        </form>
+
+        <p class="text-center text-sm pt-6">
+          একাউন্ট নেই? 
+          <a href="register.html" class="font-semibold" style="color: var(--accent-red);">রেজিস্ট্রেশন করুন</a>
+        </p>
+      </div>
+      <div class="h-2 w-full" style="background: var(--icon);"></div>
+    </div>
+  </div>
+
+  <script>
+    // GitHub-e redirect handle korar jonno dashboard file name check korun
+    // Jodi dashboard-er nam index.html hoy, tobe eita index.html hobe
+    const DASHBOARD_PAGE = "dashboard.html"; 
+
+    // Jodi user age thekei login thake
+    if(localStorage.getItem('userPhone')) {
+        window.location.href = DASHBOARD_PAGE;
+    }
+
+    const SUPABASE_URL = "https://apnzwgrupifhmifqbndu.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_Diosdxt2gvWcbb07LGYzLg_j6DM7Txn";
+
+    function togglePass(inputId, button) {
+      const input = document.getElementById(inputId);
+      const icon = button.querySelector("i");
+      if (input.type === "password") {
+        input.type = "text";
+        icon.classList.replace("fa-eye-slash", "fa-eye");
+      } else {
+        input.type = "password";
+        icon.classList.replace("fa-eye", "fa-eye-slash");
+      }
+    }
+
+    document.getElementById('loginForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const phone = document.getElementById('phone').value;
+      const pass = document.getElementById('password').value;
+      const btnText = document.getElementById('btnText');
+      const loginBtn = document.getElementById('loginBtn');
+
+      loginBtn.disabled = true;
+      btnText.innerText = "যাচাই করা হচ্ছে...";
+
+      try {
+        const response = await fetch(`${SUPABASE_URL}/rest/v1/profiles?phone=eq.${phone}`, {
+          method: "GET",
+          headers: {
+            "apikey": SUPABASE_KEY,
+            "Authorization": `Bearer ${SUPABASE_KEY}`
+          }
+        });
+
+        const data = await response.json();
+
+        if (data.length > 0) {
+          const user = data[0];
+          // Check if password exists in full_name string (formatting: Name | Pass: 123)
+          if (user.full_name.includes(`Pass: ${pass}`)) {
+            
+            // Login data browser-e save kora
+            localStorage.setItem('userPhone', phone); 
+            
+            alert("লগইন সফল হয়েছে!");
+            window.location.href = DASHBOARD_PAGE; 
+
+          } else {
+            alert("ভুল পাসওয়ার্ড! আবার চেষ্টা করুন।");
+          }
+        } else {
+          alert("অ্যাকাউন্ট পাওয়া যায়নি! দয়া করে রেজিস্ট্রেশন করুন।");
+        }
+      } catch (error) {
+        alert("নেটওয়ার্ক সমস্যা! ইন্টারনেট চেক করুন।");
+      } finally {
+        loginBtn.disabled = false;
+        btnText.innerText = "লগইন করুন";
+      }
+    });
+  </script>
+</body>
+  </html>
