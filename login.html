@@ -131,48 +131,4 @@
     });
   </script>
 </body>
-</html>      const pass = document.getElementById('password').value;
-      const btnText = document.getElementById('btnText');
-      const loginBtn = document.getElementById('loginBtn');
-
-      loginBtn.disabled = true;
-      btnText.innerText = "যাচাই করা হচ্ছে...";
-
-      try {
-        const response = await fetch(`${SUPABASE_URL}/rest/v1/profiles?phone=eq.${phone}`, {
-          method: "GET",
-          headers: {
-            "apikey": SUPABASE_KEY,
-            "Authorization": `Bearer ${SUPABASE_KEY}`
-          }
-        });
-
-        const data = await response.json();
-
-        if (data.length > 0) {
-          const user = data[0];
-          // Check if password exists in full_name string (formatting: Name | Pass: 123)
-          if (user.full_name.includes(`Pass: ${pass}`)) {
-            
-            // Login data browser-e save kora
-            localStorage.setItem('userPhone', phone); 
-            
-            alert("লগইন সফল হয়েছে!");
-            window.location.href = index.html; 
-
-          } else {
-            alert("ভুল পাসওয়ার্ড! আবার চেষ্টা করুন।");
-          }
-        } else {
-          alert("অ্যাকাউন্ট পাওয়া যায়নি! দয়া করে রেজিস্ট্রেশন করুন।");
-        }
-      } catch (error) {
-        alert("নেটওয়ার্ক সমস্যা! ইন্টারনেট চেক করুন।");
-      } finally {
-        loginBtn.disabled = false;
-        btnText.innerText = "লগইন করুন";
-      }
-    });
-  </script>
-</body>
-  </html>
+</html>      
