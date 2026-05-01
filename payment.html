@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Checkout - Easy Earning Zone</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --g1: #ff1493;
+            --g3: #E4002B;
+            --bgc: #fffdf0;
+        }
+        body { 
+            background-color: var(--bgc); 
+            font-family: 'system-ui', -apple-system, sans-serif;
+        }
+        .btn-pay { 
+            background: linear-gradient(135deg, var(--g1), var(--g3)); 
+            transition: all 0.3s ease;
+        }
+        .btn-pay:hover { opacity: 0.9; transform: translateY(-2px); }
+        .glass { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4">
+
+    <div class="glass w-full max-w-md rounded-[2.5rem] shadow-2xl p-8 text-center border border-white">
+        <div class="w-20 h-20 mx-auto bg-white rounded-3xl shadow-sm flex items-center justify-center mb-4">
+            <img src="https://bondhonpay.com/public/uploads/user/b202977c0fc07e1c6b31961a905395a8ffb23121/1765163926_808cca1b62380c77774e.png" class="w-16 h-16 object-contain" alt="EEZ">
+        </div>
+        
+        <h2 class="text-2xl font-black italic tracking-tight">EASY EARNING <span style="color: var(--g1);">ZONE</span></h2>
+        <p class="text-gray-400 text-[10px] font-bold uppercase tracking-widest mt-1">Official Payment Gateway</p>
+
+        <div class="my-8 bg-pink-50 rounded-3xl p-6 border border-pink-100">
+            <p class="text-xs font-bold text-pink-400 uppercase">Payable Amount</p>
+            <h1 class="text-4xl font-black text-pink-600">৳ ৫০.০০</h1>
+        </div>
+
+        <button onclick="createPayment()" id="payBtn" class="btn-pay w-full py-4 rounded-2xl text-white font-bold text-lg shadow-lg mb-4">
+            পেমেন্ট শুরু করুন
+        </button>
+
+        <div id="statusBox" class="hidden p-4 rounded-2xl text-sm font-bold"></div>
+
+        <p class="mt-6 text-[10px] text-gray-400 font-bold uppercase tracking-widest">
+            <i class="fa fa-shield-halved mr-1"></i> Secured by BondhonPay
+        </p>
+    </div>
+
+    <script>
+        // --- সেটিংস ---
+        const API_KEY = "YOUR_API_KEY_HERE"; // আপনার BondhonPay API Key এখানে দিন
+        const CREATE_URL = "https://payment.bondhonpay.com/api/payment/create";
+        const VERIFY_URL = "https://payment.bondhonpay.com/api/payment/verify";
+
+        // ১. পেমেন্ট তৈরি করার ফাংশন
+        async function createPayment() {
+            const btn = document.getElementById('payBtn');
+            btn.innerHTML = '<i class="fa fa-spinner fa-spin mr-2"></i> প্রোসেসিং...';
+            btn.disabled = true;
+
+            const payload = {
+                api_key: API_KEY,
+                cus_name: "Mohammad Ahad",
+                cus_email: "ahad@example.com",
+                cus_phone: "01739971738",
+                amount: "50",
+                order_id: "EEZ" + Date.now(),
+                desc: "Wallet Topup",
+                success_url: window.location.href, // পেমেন্ট শেষে এই পেজেই ফিরে আসবে
+                fail_url: window.location.href,
+                cancel_url: window.location.href,
+                type: "json"
+            };
+
+            try {
+                const response = await fetch(CREATE_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+
+                if (data.status === "success" && data.payment_url) {
+                    window.location.href = data.payment_url;
+                } else {
+                    alert("ভুল: " + data.message);
+                    resetBtn();
+                }
+            } catch (err) {
+                console.error(err);
+                alert("সার্ভার এরর! সম্ভবত CORS সমস্যা। আপনার API ড্যাশবোর্ডে ডোমেইন হোয়াইটলিস্ট করা আছে কি না চেক করুন।");
+                resetBtn();
+            }
+        }
+
+        // ২. পেমেন্ট ভেরিফাই করার ফাংশন (পেমেন্ট শেষে অটো কল হবে)
+        async function verifyPayment(transId) {
+            const statusBox = document.getElementById('statusBox');
+            statusBox.classList.remove('hidden');
+            statusBox.innerHTML = "পেমেন্ট ভেরিফাই করা হচ্ছে...";
+            statusBox.className = "p-4 rounded-2xl text-sm font-bold bg-blue-50 text-blue-600";
+
+            try {
+                const response = await fetch(VERIFY_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'API-KEY': API_KEY // আপনার curl কমান্ড অনুযায়ী হেডারে কি দেওয়া হয়েছে
+                    },
+                    body: JSON.stringify({ transaction_id: transId })
+                });
+
+                const result = await response.json();
+
+                if (result.status === "COMPLETED" || result.status === "SUCCESS") {
+                    statusBox.innerHTML = "পেমেন্ট সফল! TrxID: " + result.trx_id;
+                    statusBox.className = "p-4 rounded-2xl text-sm font-bold bg-green-50 text-green-600";
+                    // এখানে আপনার ডাটাবেজ আপডেটের কোড লিখুন
+                } else {
+                    statusBox.innerHTML = "পেমেন্ট ব্যর্থ! স্ট্যাটাস: " + result.status;
+                    statusBox.className = "p-4 rounded-2xl text-sm font-bold bg-red-50 text-red-600";
+                }
+            } catch (err) {
+                statusBox.innerHTML = "ভেরিফিকেশন এরর!";
+            }
+        }
+
+        function resetBtn() {
+            const btn = document.getElementById('payBtn');
+            btn.innerHTML = "পেমেন্ট শুরু করুন";
+            btn.disabled = false;
+        }
+
+        // ৩. পেজ লোড হলে চেক করা (URL এ transaction_id আছে কি না)
+        window.onload = () => {
+            const params = new URLSearchParams(window.location.search);
+            const bondhonID = params.get('transaction_id'); // BondhonPay পেমেন্ট শেষে এটি পাঠায়
+            if (bondhonID) {
+                verifyPayment(bondhonID);
+            }
+        };
+    </script>
+</body>
+</html>
