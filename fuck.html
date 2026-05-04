@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <title>Master Admin - EEZ</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        :root { --g1: #ff1493; --g2: #ffd700; --bg: #fffdf0; }
+        body { background: var(--bg); font-family: sans-serif; }
+        .glass-card { background: white; border-radius: 20px; border: 1px solid #eee; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        .tab-btn.active { border-bottom: 3px solid var(--g1); color: var(--g1); }
+    </style>
+</head>
+<body class="p-4 pb-24">
+
+    <!-- Header -->
+    <header class="flex justify-between items-center mb-6 bg-white p-4 rounded-2xl shadow-sm">
+        <div>
+            <h1 class="text-xl font-black italic text-pink-600">EEZ CONTROL</h1>
+            <p class="text-[10px] font-bold text-gray-400">ADMINISTRATOR ONLY</p>
+        </div>
+        <button onclick="location.reload()" class="w-10 h-10 bg-pink-50 rounded-full text-pink-600"><i class="fa fa-sync-alt"></i></button>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <div class="flex overflow-x-auto gap-4 mb-6 no-scrollbar pb-2">
+        <button onclick="showSection('users')" class="tab-btn active whitespace-nowrap font-bold text-sm px-2 py-1">ইউজার ম্যানেজ</button>
+        <button onclick="showSection('tasks')" class="tab-btn whitespace-nowrap font-bold text-sm px-2 py-1">নতুন কাজ (Gmail/Video)</button>
+        <button onclick="showSection('withdraws')" class="tab-btn whitespace-nowrap font-bold text-sm px-2 py-1">উইথড্র রিকোয়েস্ট</button>
+        <button onclick="showSection('settings')" class="tab-btn whitespace-nowrap font-bold text-sm px-2 py-1">সেটিংস</button>
+    </div>
+
+    <!-- Section: User Management -->
+    <div id="users" class="section-content">
+        <div class="glass-card p-4 mb-4">
+            <div class="flex gap-2">
+                <input id="searchPhone" type="text" placeholder="নম্বর দিয়ে ইউজার খুঁজুন..." class="flex-1 bg-slate-50 p-3 rounded-xl text-xs outline-none border focus:border-pink-300">
+                <button onclick="searchUser()" class="bg-pink-600 text-white px-4 rounded-xl font-bold text-xs">SEARCH</button>
+            </div>
+        </div>
+        <div id="userDetails" class="hidden glass-card p-5 relative">
+            <button onclick="deleteUser()" class="absolute top-4 right-4 text-red-500"><i class="fa fa-trash-alt"></i></button>
+            <h3 id="uName" class="font-black text-lg">---</h3>
+            <p id="uPhone" class="text-xs text-gray-500 mb-4">---</p>
+            
+            <div class="grid grid-cols-2 gap-3 mb-6">
+                <div class="bg-blue-50 p-3 rounded-xl">
+                    <p class="text-[9px] font-bold text-blue-400 uppercase">ব্যালেন্স</p>
+                    <input id="uBalance" type="number" class="w-full bg-transparent font-black text-blue-700 outline-none">
+                </div>
+                <div class="bg-pink-50 p-3 rounded-xl">
+                    <p class="text-[9px] font-bold text-pink-400 uppercase">ভেরিফাই স্ট্যাটাস</p>
+                    <select id="uVerify" class="w-full bg-transparent font-black text-pink-700 outline-none">
+                        <option value="true">Verified</option>
+                        <option value="false">Unverified</option>
+                    </select>
+                </div>
+            </div>
+            <button onclick="saveUserChanges()" class="w-full py-3 bg-slate-800 text-white rounded-xl font-bold text-sm">UPDATE USER INFO</button>
+        </div>
+    </div>
+
+    <!-- Section: Tasks Management -->
+    <div id="tasks" class="section-content hidden">
+        <h2 class="font-bold text-slate-700 mb-4 ml-1">পেন্ডিং জিমেইল ও ভিডিও টাস্ক</h2>
+        <div id="taskList" class="space-y-3">
+            <!-- Dynamic Data -->
+        </div>
+    </div>
+
+    <!-- Section: Withdraw Management -->
+    <div id="withdraws" class="section-content hidden">
+        <h2 class="font-bold text-slate-700 mb-4 ml-1">উইথড্র রিকোয়েস্ট লিস্ট</h2>
+        <div id="withdrawList" class="space-y-3">
+            <!-- Dynamic Data -->
+        </div>
+    </div>
+
+    <!-- Section: Settings -->
+    <div id="settings" class="section-content hidden">
+        <div class="glass-card p-5">
+            <h2 class="font-bold mb-4">অ্যাপ কন্ট্রোল</h2>
+            <div class="space-y-4">
+                <div>
+                    <label class="text-[10px] font-bold text-gray-400">নোটিশ (Marquee)</label>
+                    <textarea id="appNotice" class="w-full mt-1 p-3 bg-slate-50 border rounded-xl text-xs" rows="3"></textarea>
+                </div>
+                <button onclick="updateAppSettings()" class="w-full py-3 bg-pink-600 text-white rounded-xl font-bold">SAVE SETTINGS</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = "https://apnzwgrupifhmifqbndu.supabase.co";
+        const SUPABASE_KEY = "sb_publishable_Diosdxt2gvWcbb07LGYzLg_j6DM7Txn";
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        // Navigation
+        function showSection(id) {
+            document.querySelectorAll('.section-content').forEach(s => s.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(id).classList.remove('hidden');
+            event.target.classList.add('active');
+            if(id === 'tasks') loadTasks();
+            if(id === 'withdraws') loadWithdraws();
+        }
+
+        // User Control
+        async function searchUser() {
+            const phone = document.getElementById('searchPhone').value;
+            const { data, error } = await supabase.from('profiles').select('*').eq('phone', phone).single();
+            if(data) {
+                document.getElementById('userDetails').classList.remove('hidden');
+                document.getElementById('uName').innerText = data.full_name;
+                document.getElementById('uPhone').innerText = data.phone;
+                document.getElementById('uBalance').value = data.balance || 0;
+                document.getElementById('uVerify').value = data.is_verified.toString();
+            } else { alert("ইউজার পাওয়া যায়নি!"); }
+        }
+
+        async function saveUserChanges() {
+            const phone = document.getElementById('uPhone').innerText;
+            const balance = document.getElementById('uBalance').value;
+            const verify = document.getElementById('uVerify').value === 'true';
+            
+            const { error } = await supabase.from('profiles').update({ balance: balance, is_verified: verify }).eq('phone', phone);
+            if(!error) alert("আপডেট সফল হয়েছে!");
+        }
+
+        async function deleteUser() {
+            if(confirm("আপনি কি নিশ্চিতভাবে এই ইউজারকে ডিলিট করতে চান?")) {
+                const phone = document.getElementById('uPhone').innerText;
+                await supabase.from('profiles').delete().eq('phone', phone);
+                alert("ইউজার ডিলিট করা হয়েছে।");
+                location.reload();
+            }
+        }
+
+        // Task & Withdraw Control
+        async function loadTasks() {
+            const { data } = await supabase.from('task_submissions').select('*').eq('status', 'PENDING');
+            const list = document.getElementById('taskList');
+            list.innerHTML = data.length ? '' : '<p class="text-center text-xs text-gray-400">কোনো কাজ জমা পড়েনি</p>';
+            data.forEach(t => {
+                list.innerHTML += `
+                <div class="glass-card p-4">
+                    <div class="flex justify-between text-[10px] font-bold mb-2">
+                        <span class="text-pink-600">${t.phone}</span>
+                        <span class="text-blue-500">${t.type || 'GMAIL SELL'}</span>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="updateTask('${t.id}', 'SUCCESS')" class="flex-1 py-2 bg-green-500 text-white rounded-lg text-[10px] font-bold">APPROVE</button>
+                        <button onclick="updateTask('${t.id}', 'REJECTED')" class="flex-1 py-2 bg-red-500 text-white rounded-lg text-[10px] font-bold">REJECT</button>
+                    </div>
+                </div>`;
+            });
+        }
+
+        async function updateAppSettings() {
+            const notice = document.getElementById('appNotice').value;
+            await supabase.from('app_settings').update({ notice: notice }).eq('id', 1);
+            alert("নোটিশ আপডেট হয়েছে!");
+        }
+
+        window.onload = () => { 
+            // Initial settings load
+            supabase.from('app_settings').select('notice').eq('id', 1).single().then(({data}) => {
+                if(data) document.getElementById('appNotice').value = data.notice;
+            });
+        };
+    </script>
+</body>
+      </html>
