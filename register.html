@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EASY EARNING BD | DEVELOPED BY AHAD</title>
+
+    <!-- Font & Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Supabase Client Library (Standard Version for better compatibility) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        :root {
+            --primary: #008744;
+            --secondary: #00b15d;
+            --bg: #f5f7fb;
+            --white: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Hind Siliguri', sans-serif;
+        }
+
+        body {
+            background: var(--bg);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .register-card {
+            width: 100%;
+            max-width: 420px;
+            background: #fff;
+            padding: 35px 25px;
+            border-radius: 25px;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.08);
+        }
+
+        .logo {
+            text-align: center;
+            font-size: 28px;
+            font-weight: 800;
+            font-family: 'Poppins', sans-serif;
+            color: var(--primary);
+            margin-bottom: 5px;
+        }
+
+        .logo span { color: #222; }
+
+        .subtitle {
+            text-align: center;
+            font-size: 14px;
+            color: #777;
+            margin-bottom: 25px;
+        }
+
+        .input-group {
+            position: relative;
+            margin-bottom: 15px;
+        }
+
+        .input-group i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #777;
+            font-size: 14px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 14px 15px 14px 45px;
+            border: 1.5px solid #eee;
+            border-radius: 12px;
+            outline: none;
+            font-size: 15px;
+            transition: 0.3s;
+        }
+
+        .input-group input:focus {
+            border-color: var(--primary);
+            background: #f9fffb;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            background: var(--primary);
+            color: #fff;
+            font-size: 17px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: .3s;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            background: #999;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .footer a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+
+<div class="register-card">
+    <div class="logo">EASY <span>EARNING BD</span></div>
+    <p class="subtitle">নতুন অ্যাকাউন্ট তৈরি করুন</p>
+
+    <form id="regForm">
+        <div class="input-group">
+            <i class="fa-solid fa-user"></i>
+            <input type="text" id="name" placeholder="আপনার নাম" required>
+        </div>
+
+        <div class="input-group">
+            <i class="fa-solid fa-phone"></i>
+            <input type="number" id="mobile" placeholder="মোবাইল নাম্বার" required>
+        </div>
+
+        <div class="input-group">
+            <i class="fa-solid fa-envelope"></i>
+            <input type="email" id="email" placeholder="ইমেইল" required>
+        </div>
+
+        <div class="input-group">
+            <i class="fa-solid fa-lock"></i>
+            <input type="password" id="password" placeholder="পাসওয়ার্ড" required>
+        </div>
+
+        <div class="input-group">
+            <i class="fa-solid fa-users"></i>
+            <input type="text" id="ref" placeholder="রেফার কোড (ঐচ্ছিক)">
+        </div>
+
+        <button type="submit" class="btn" id="btn">রেজিস্ট্রেশন করুন</button>
+    </form>
+
+    <div class="footer">
+        আগে থেকেই অ্যাকাউন্ট আছে? <a href="login.php">লগইন করুন</a>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+const supabaseUrl = "https://vdidrydxmfdmhugkdofe.supabase.co";
+const supabaseKey = "sb_publishable_nM-WqxyZA77eiwXCM9ureQ_Fk2eV0mv"; // ⚠️ এখানে ঠিক key দিবে
+
+const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+
+document.getElementById("regForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const btn = document.getElementById("btn");
+    btn.disabled = true;
+    btn.innerText = "লোডিং...";
+
+    const name = document.getElementById("name").value;
+    const mobile = document.getElementById("mobile").value;
+    const email = document.getElementById("email").value;
+    const password = document.getElementById("password").value;
+    const ref = document.getElementById("ref").value;
+
+    const referralCode =  + Math.floor(100000 + Math.random() * 900000);
+
+    try {
+        const { data: existing } = await supabaseClient
+            .from("users")
+            .select("mobile")
+            .eq("mobile", mobile)
+            .maybeSingle();
+
+        if (existing) {
+            alert("এই নাম্বার আগে থেকেই আছে!");
+            return;
+        }
+
+        const { error } = await supabaseClient
+            .from("users")
+            .insert([{
+                full_name: name,
+                mobile: mobile,
+                email: email,
+                password: password,
+                referral_code: referralCode,
+                referred_by: ref || null,
+                balance: 0
+            }]);
+
+        if (error) throw error;
+
+        alert("রেজিস্ট্রেশন সফল! কোড: " + referralCode);
+        document.getElementById("regForm").reset();
+
+    } catch (err) {
+        alert("Error: " + err.message);
+        console.log(err);
+    }
+
+    btn.disabled = false;
+    btn.innerText = "রেজিস্ট্রেশন করুন";
+});
+</script>
+
+</body>
+  </html>
